@@ -316,36 +316,50 @@ typedef struct CvScalar {
 }
 CvScalar;
 
+typedef struct CvPoint2D32f {
+    float x;
+    float y;
+}
+CvPoint2D32f;
+
+typedef struct CvTermCriteria {
+    int type; /* may be combination of
+                     CV_TERMCRIT_ITER
+                     CV_TERMCRIT_EPS */
+    int max_iter;
+    double epsilon;
+}
+CvTermCriteria;
+
 typedef struct CvMemStorage CvMemStorage;
 typedef signed char schar;
 
-typedef struct CvSeqBlock
-{
-    struct CvSeqBlock*  prev; /* Previous sequence block.                   */
-    struct CvSeqBlock*  next; /* Next sequence block.                       */
-  int    start_index;         /* Index of the first element in the block +  */
-                              /* sequence->first->start_index.              */
-    int    count;             /* Number of elements in the block.           */
-    schar* data;              /* Pointer to the first element of the block. */
+typedef struct CvSeqBlock {
+    struct CvSeqBlock* prev; /* Previous sequence block.                   */
+    struct CvSeqBlock* next; /* Next sequence block.                       */
+    int start_index; /* Index of the first element in the block +  */
+    /* sequence->first->start_index.              */
+    int count; /* Number of elements in the block.           */
+    schar* data; /* Pointer to the first element of the block. */
 }
 CvSeqBlock;
 
 typedef struct CvSeq {
-       int       flags;             
-       int       header_size;      
-       struct    CvSeq* h_prev;   
-       struct    CvSeq* h_next;   
-       struct    CvSeq* v_prev;      
-       struct    CvSeq* v_next; 
-       int       total;          /* Total number of elements.            */ 
-       int       elem_size;      /* Size of sequence element in bytes.   */ 
-       schar*    block_max;      /* Maximal bound of the last block.     */ 
-       schar*    ptr;            /* Current write pointer.               */ 
-       int       delta_elems;    /* Grow seq this many at a time.        */ 
-       CvMemStorage* storage;    /* Where the seq is stored.             */ 
-       CvSeqBlock* free_blocks;  /* Free blocks list.                    */
-       CvSeqBlock* first;        /* Pointer to the first sequence block. */
-}CvSeq;
+    int flags;
+    int header_size;
+    struct CvSeq* h_prev;
+    struct CvSeq* h_next;
+    struct CvSeq* v_prev;
+    struct CvSeq* v_next;
+    int total; /* Total number of elements.            */
+    int elem_size; /* Size of sequence element in bytes.   */
+    schar* block_max; /* Maximal bound of the last block.     */
+    schar* ptr; /* Current write pointer.               */
+    int delta_elems; /* Grow seq this many at a time.        */
+    CvMemStorage* storage; /* Where the seq is stored.             */
+    CvSeqBlock* free_blocks; /* Free blocks list.                    */
+    CvSeqBlock* first; /* Pointer to the first sequence block. */
+} CvSeq;
 
 typedef struct CvSize {
     int width;
@@ -353,14 +367,32 @@ typedef struct CvSize {
 }
 CvSize;
 
-typedef struct CvPoint
-{
+typedef struct CvPoint {
     int x;
     int y;
 }
 CvPoint;
 
-typedef struct CvMat CvMat;
+//typedef struct CvMat CvMat;
+typedef struct CvMat {
+    int type;
+    int step;
+    /* for internal use only */
+    int* refcount;
+    int hdr_refcount;
+    union {
+        uchar* ptr;
+        short* s;
+        int* i;
+        float* fl;
+        double* db;
+    } data;
+    
+    int rows;
+    int cols;
+
+}
+CvMat;
 typedef void ( *CvTrackbarCallback) (int pos);
 typedef void ( *CvTrackbarCallback2)(int pos, void* userdata);
 
@@ -462,45 +494,45 @@ enum {
 };
 
 typedef struct CvCapture CvCapture;
-typedef struct _IplROI
-{
-    int  coi; /* 0 - no COI (all channels are selected), 1 - 0th channel is selected ...*/
-    int  xOffset;
-    int  yOffset;
-    int  width;
-    int  height;
+
+typedef struct _IplROI {
+    int coi; /* 0 - no COI (all channels are selected), 1 - 0th channel is selected ...*/
+    int xOffset;
+    int yOffset;
+    int width;
+    int height;
 }
 IplROI;
-typedef struct _IplImage
-{
-    int  nSize;             /* sizeof(IplImage) */
-    int  ID;                /* version (=0)*/
-    int  nChannels;         /* Most of OpenCV functions support 1,2,3 or 4 channels */
-    int  alphaChannel;      /* Ignored by OpenCV */
-    int  depth;             /* Pixel depth in bits: IPL_DEPTH_8U, IPL_DEPTH_8S, IPL_DEPTH_16S,
+
+typedef struct _IplImage {
+    int nSize; /* sizeof(IplImage) */
+    int ID; /* version (=0)*/
+    int nChannels; /* Most of OpenCV functions support 1,2,3 or 4 channels */
+    int alphaChannel; /* Ignored by OpenCV */
+    int depth; /* Pixel depth in bits: IPL_DEPTH_8U, IPL_DEPTH_8S, IPL_DEPTH_16S,
                                IPL_DEPTH_32S, IPL_DEPTH_32F and IPL_DEPTH_64F are supported.  */
-    char colorModel[4];     /* Ignored by OpenCV */
-    char channelSeq[4];     /* ditto */
-    int  dataOrder;         /* 0 - interleaved color channels, 1 - separate color channels.
+    char colorModel[4]; /* Ignored by OpenCV */
+    char channelSeq[4]; /* ditto */
+    int dataOrder; /* 0 - interleaved color channels, 1 - separate color channels.
                                cvCreateImage can only create interleaved images */
-    int  origin;            /* 0 - top-left origin,
+    int origin; /* 0 - top-left origin,
                                1 - bottom-left origin (Windows bitmaps style).  */
-    int  align;             /* Alignment of image rows (4 or 8).
+    int align; /* Alignment of image rows (4 or 8).
                                OpenCV ignores it and uses widthStep instead.    */
-    int  width;             /* Image width in pixels.                           */
-    int  height;            /* Image height in pixels.                          */
-    struct _IplROI *roi;    /* Image ROI. If NULL, the whole image is selected. */
-    struct _IplImage *maskROI;      /* Must be NULL. */
-    void  *imageId;                 /* "           " */
-    struct _IplTileInfo *tileInfo;  /* "           " */
-    int  imageSize;         /* Image data size in bytes
+    int width; /* Image width in pixels.                           */
+    int height; /* Image height in pixels.                          */
+    struct _IplROI *roi; /* Image ROI. If NULL, the whole image is selected. */
+    struct _IplImage *maskROI; /* Must be NULL. */
+    void *imageId; /* "           " */
+    struct _IplTileInfo *tileInfo; /* "           " */
+    int imageSize; /* Image data size in bytes
                                (==image->height*image->widthStep
                                in case of interleaved data)*/
-    char *imageData;        /* Pointer to aligned image data.         */
-    int  widthStep;         /* Size of aligned image row in bytes.    */
-    int  BorderMode[4];     /* Ignored by OpenCV.                     */
-    int  BorderConst[4];    /* Ditto.                                 */
-    char *imageDataOrigin;  /* Pointer to very origin of image data
+    char *imageData; /* Pointer to aligned image data.         */
+    int widthStep; /* Size of aligned image row in bytes.    */
+    int BorderMode[4]; /* Ignored by OpenCV.                     */
+    int BorderConst[4]; /* Ditto.                                 */
+    char *imageDataOrigin; /* Pointer to very origin of image data
                                (not necessarily aligned) -
                                needed for correct deallocation */
 }
@@ -509,7 +541,7 @@ typedef struct CvVideoWriter CvVideoWriter;
 typedef struct CvBox2D CvBox2D;
 typedef struct CvVideoWriter CvVideoWriter;
 
-typedef struct CvHaarClassifierCascade  CvHaarClassifierCascade ;
+typedef struct CvHaarClassifierCascade CvHaarClassifierCascade;
 int cvNamedWindow(const char* name, int flags);
 
 void cvSetWindowProperty(const char* name, int prop_id, double prop_value);
@@ -563,65 +595,114 @@ int cvStartWindowThread(void);
 
 int cvCreateTrackbar(const char *trackbar_name, const char *window_name, int *value, int count, CvTrackbarCallback on_change);
 
-int cvCreateTrackbar2( const char* trackbar_name, const char* window_name,
-                              int* value, int count, CvTrackbarCallback2 on_change,
-                              void* userdata);
+int cvCreateTrackbar2(const char* trackbar_name, const char* window_name,
+        int* value, int count, CvTrackbarCallback2 on_change,
+        void* userdata);
 
 /* retrieve or set trackbar position */
-int cvGetTrackbarPos( const char* trackbar_name, const char* window_name );
-void cvSetTrackbarPos( const char* trackbar_name, const char* window_name, int pos );
+int cvGetTrackbarPos(const char* trackbar_name, const char* window_name);
+void cvSetTrackbarPos(const char* trackbar_name, const char* window_name, int pos);
 //void cvSetTrackbarMax(const char* trackbar_name, const char* window_name, int maxval);
 //void cvSetTrackbarMin(const char* trackbar_name, const char* window_name, int minval);                              
 
-enum
-{
-    CV_EVENT_MOUSEMOVE      =0,
-    CV_EVENT_LBUTTONDOWN    =1,
-    CV_EVENT_RBUTTONDOWN    =2,
-    CV_EVENT_MBUTTONDOWN    =3,
-    CV_EVENT_LBUTTONUP      =4,
-    CV_EVENT_RBUTTONUP      =5,
-    CV_EVENT_MBUTTONUP      =6,
-    CV_EVENT_LBUTTONDBLCLK  =7,
-    CV_EVENT_RBUTTONDBLCLK  =8,
-    CV_EVENT_MBUTTONDBLCLK  =9,
-    CV_EVENT_MOUSEWHEEL     =10,
-    CV_EVENT_MOUSEHWHEEL    =11
+enum {
+    CV_EVENT_MOUSEMOVE = 0,
+    CV_EVENT_LBUTTONDOWN = 1,
+    CV_EVENT_RBUTTONDOWN = 2,
+    CV_EVENT_MBUTTONDOWN = 3,
+    CV_EVENT_LBUTTONUP = 4,
+    CV_EVENT_RBUTTONUP = 5,
+    CV_EVENT_MBUTTONUP = 6,
+    CV_EVENT_LBUTTONDBLCLK = 7,
+    CV_EVENT_RBUTTONDBLCLK = 8,
+    CV_EVENT_MBUTTONDBLCLK = 9,
+    CV_EVENT_MOUSEWHEEL = 10,
+    CV_EVENT_MOUSEHWHEEL = 11
 };
 
-enum
-{
-    CV_EVENT_FLAG_LBUTTON   =1,
-    CV_EVENT_FLAG_RBUTTON   =2,
-    CV_EVENT_FLAG_MBUTTON   =4,
-    CV_EVENT_FLAG_CTRLKEY   =8,
-    CV_EVENT_FLAG_SHIFTKEY  =16,
-    CV_EVENT_FLAG_ALTKEY    =32
+enum {
+    CV_EVENT_FLAG_LBUTTON = 1,
+    CV_EVENT_FLAG_RBUTTON = 2,
+    CV_EVENT_FLAG_MBUTTON = 4,
+    CV_EVENT_FLAG_CTRLKEY = 8,
+    CV_EVENT_FLAG_SHIFTKEY = 16,
+    CV_EVENT_FLAG_ALTKEY = 32
 };
 
-typedef void (*CvMouseCallback )(int event, int x, int y, int flags, void* param);
+typedef void (*CvMouseCallback)(int event, int x, int y, int flags, void* param);
 
 /* assign callback for mouse events */
-void cvSetMouseCallback( const char* window_name, CvMouseCallback on_mouse,
-                                void* param);
+void cvSetMouseCallback(const char* window_name, CvMouseCallback on_mouse,
+        void* param);
 
 /* wait for key event infinitely (delay<=0) or for "delay" milliseconds */
 int cvWaitKey(int delay);
 void cvUpdateWindow(const char* window_name);
 
-/* core_cv.h*/
-void* cvLoad(const char* filename, void* memstorage,
-                     const char* name, const char** real_name);
-CvMemStorage*  cvCreateMemStorage( int block_size);
+/*
+ * core_cv.h
+ */
+typedef struct CvFont
+{
+  const char* nameFont;   //Qt:nameFont
+  CvScalar color;       //Qt:ColorFont -> cvScalar(blue_component, green_component, red\_component[, alpha_component])
+    int         font_face;    //Qt: bool italic         /* =CV_FONT_* */
+    const int*  ascii;      /* font data and metrics */
+    const int*  greek;
+    const int*  cyrillic;
+    float       hscale, vscale;
+    float       shear;      /* slope coefficient: 0 - normal, >0 - italic */
+    int         thickness;    //Qt: weight               /* letters thickness */
+    float       dx;       /* horizontal interval between letters */
+    int         line_type;    //Qt: PointSize
+}
+CvFont;
+void* cvLoad(const char* filename, void* memstorage, const char* name, const char** real_name);
 
-void  cvReleaseMemStorage( CvMemStorage** storage );
+CvMemStorage* cvCreateMemStorage(int block_size);
 
-schar* cvGetSeqElem( const CvSeq* seq, int index );
+void cvReleaseMemStorage(CvMemStorage** storage);
 
-IplImage* cvCreateImage( CvSize size, int depth, int channels);
+schar* cvGetSeqElem(const CvSeq* seq, int index);
+
+IplImage* cvCreateImage(CvSize size, int depth, int channels);
+
+IplImage* cvCloneImage( const IplImage* image );
+
+void cvCopy( const CvArr* src, CvArr* dst,const CvArr* mask);
+
+void  cvFlip( const CvArr* src, CvArr* dst,int flip_mode);
+void  cvInitFont( CvFont* font, int font_face,
+                         double hscale, double vscale,
+                         double shear,int thickness,int line_type );
+void  cvPutText( CvArr* img, const char* text, CvPoint org, const CvFont* font, CvScalar color );
 
 /*imageProc.h*/
 void cvRectangle(CvArr* img, CvPoint pt1, CvPoint pt2, CvScalar color, int thickness, int line_type, int shift);
-CvHistogram*  cvCreateHist( int dims, int* sizes, int type,float** ranges,int uniform);
+CvHistogram* cvCreateHist(int dims, int* sizes, int type, float** ranges, int uniform);
+void cvCvtColor(const CvArr* src, CvArr* dst, int code);
+void cvWatershed(const CvArr* image, CvArr* markers);
+void cvLaplace(const CvArr* src, CvArr* dst, int aperture_size);
+void cvSobel(const CvArr* src, CvArr* dst,
+        int xorder, int yorder, int aperture_size);
+void cvCanny(const CvArr* image, CvArr* edges, double threshold1,
+        double threshold2, int aperture_size);
+void cvPreCornerDetect(const CvArr* image, CvArr* corners,
+        int aperture_size);
+void cvCornerEigenValsAndVecs(const CvArr* image, CvArr* eigenvv,
+        int block_size, int aperture_size);
+
+void cvCornerMinEigenVal(const CvArr* image, CvArr* eigenval,
+        int block_size, int aperture_size);
 
 
+void cvCornerHarris(const CvArr* image, CvArr* harris_response,
+        int block_size, int aperture_size,double k);
+
+void cvFindCornerSubPix(const CvArr* image, CvPoint2D32f* corners,
+        int count, CvSize win, CvSize zero_zone,CvTermCriteria criteria);
+
+void cvGoodFeaturesToTrack(const CvArr* image, CvArr* eig_image,
+        CvArr* temp_image, CvPoint2D32f* corners,
+        int* corner_count, double quality_level, double min_distance,
+        const CvArr* mask,int block_size,int use_harris,double k);

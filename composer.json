@@ -1,0 +1,34 @@
+{
+  "name": "ghostjat/openCv",
+  "description": "PHP bindings to the opencv using ffi.",
+  "keywords": [
+    "vision",
+    "php",
+    "ffi",
+    "opencv",
+    "ml"
+  ],
+  "homepage": "https://github.com/ghostjat/php_opencv",
+  "license": "Apache-2.0",
+  "version": "0.1-alpha",
+  "authors": [
+    {
+      "name": "Shubham Chaudhary",
+      "email": "ghost.jat@gmail.com",
+      "role": "dev"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/ghostjat/php_opencv/issues?state=open",
+    "source": "https://github.com/ghostjat/php_opencv"
+  },
+  "require": {
+    "php": ">=7.4.0",
+    "ext-ffi": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "openCv\\": "src"
+    }
+  }
+}

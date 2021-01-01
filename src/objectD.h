@@ -6,23 +6,73 @@
 #define CV_TYPE_NAME_HAAR    "opencv-haar-classifier"
 #define CV_HAAR_FEATURE_MAX  3
 
-typedef struct CvHaarFeature CvHaarFeature;
-typedef struct CvHaarClassifier CvHaarClassifier;
-typedef struct CvHaarStageClassifier CvHaarStageClassifier;
+
+typedef struct CvRect {
+    int x;
+    int y;
+    int width;
+    int height;
+}
+CvRect;
+
+typedef struct CvSize {
+    int width;
+    int height;
+}
+CvSize;
+
+typedef struct CvHaarFeature {
+    int tilted;
+    struct {
+        CvRect r;
+        float weight;
+    } rect[3];
+} CvHaarFeature;
+
+typedef struct CvHaarClassifier {
+    int count;
+    CvHaarFeature* haar_feature;
+    float* threshold;
+    int* left;
+    int* right;
+    float* alpha;
+} CvHaarClassifier;
+
+typedef struct CvHaarStageClassifier {
+    int  count;
+    float threshold;
+    CvHaarClassifier* classifier;
+
+    int next;
+    int child;
+    int parent;
+} CvHaarStageClassifier;
+
 typedef struct CvHidHaarClassifierCascade CvHidHaarClassifierCascade;
-typedef struct CvHaarClassifierCascade CvHaarClassifierCascade;
-typedef struct CvAvgComp CvAvgComp;
+typedef struct CvHaarClassifierCascade {
+    int  flags;
+    int  count;
+    CvSize orig_window_size;
+    CvSize real_window_size;
+    double scale;
+    CvHaarStageClassifier* stage_classifier;
+    CvHidHaarClassifierCascade* hid_cascade;
+} CvHaarClassifierCascade;
+
+typedef struct CvAvgComp {
+    CvRect rect;
+    int neighbors;
+} CvAvgComp;
 
 typedef signed char schar;
-typedef struct CvMemBlock
-{
+
+typedef struct CvMemBlock {
     struct CvMemBlock*  prev;
     struct CvMemBlock*  next;
 }
 CvMemBlock;
 
-typedef struct CvMemStorage
-{
+typedef struct CvMemStorage {
     int signature;
     CvMemBlock* bottom;           /* First allocated block.                   */
     CvMemBlock* top;              /* Current memory block - top of the stack. */
@@ -33,8 +83,7 @@ typedef struct CvMemStorage
 CvMemStorage;
 
 
-typedef struct CvSeqBlock
-{
+typedef struct CvSeqBlock {
     struct CvSeqBlock*  prev; /* Previous sequence block.                   */
     struct CvSeqBlock*  next; /* Next sequence block.                       */
   int    start_index;         /* Index of the first element in the block +  */
@@ -43,6 +92,7 @@ typedef struct CvSeqBlock
     schar* data;              /* Pointer to the first element of the block. */
 }
 CvSeqBlock;
+
 typedef struct CvSeq {
        int       flags;             
        int       header_size;      
@@ -61,12 +111,11 @@ typedef struct CvSeq {
 }CvSeq;
 
 
-typedef struct CvSize {
-    int width;
-    int height;
+typedef struct CvPoint {
+    int x;
+    int y;
 }
-CvSize;
-typedef struct CvPoint CvPoint;
+CvPoint;
 typedef void CvArr;
 
 
